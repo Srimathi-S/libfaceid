@@ -64,7 +64,7 @@ def process_facedetection():
     model_poseestimator=FacePoseEstimatorModels.DEFAULT
     model_ageestimator=FaceAgeEstimatorModels.DEFAULT
     model_genderestimator=FaceGenderEstimatorModels.DEFAULT
-    model_emotionestimator=FaceEmotionEstimatorModels.DEFAULT
+    # model_emotionestimator=FaceEmotionEstimatorModels.DEFAULT
 
 
     # Initialize the camera
@@ -77,7 +77,7 @@ def process_facedetection():
         face_pose_estimator = FacePoseEstimator(model=model_poseestimator, path=INPUT_DIR_MODEL_ESTIMATION)
         face_age_estimator = FaceAgeEstimator(model=model_ageestimator, path=INPUT_DIR_MODEL_ESTIMATION)
         face_gender_estimator = FaceGenderEstimator(model=model_genderestimator, path=INPUT_DIR_MODEL_ESTIMATION)
-        face_emotion_estimator = FaceEmotionEstimator(model=model_emotionestimator, path=INPUT_DIR_MODEL_ESTIMATION)
+        # face_emotion_estimator = FaceEmotionEstimator(model=model_emotionestimator, path=INPUT_DIR_MODEL_ESTIMATION)
     except:
         print("Warning, check if models and trained dataset models exists!")
     (age, gender, emotion) = (None, None, None)
@@ -101,7 +101,7 @@ def process_facedetection():
             face_image = frame[y:y+h, h:h+w]
             age = face_age_estimator.estimate(frame, face_image)
             gender = face_gender_estimator.estimate(frame, face_image)
-            emotion = face_emotion_estimator.estimate(frame, face_image)
+            # emotion = face_emotion_estimator.estimate(frame, face_image)
 
             # Detect and draw face pose locations
             shape = face_pose_estimator.detect(frame, face)
@@ -138,4 +138,4 @@ def video_viewer():
 if __name__ == '__main__':
     print("\n\nNote: Open browser and type http://127.0.0.1:5000/ or http://ip_address:5000/ \n\n")
     # Run flask for web app
-    app.run(host='0.0.0.0', threaded=True, debug=True)
+    app.run(host='0.0.0.0', threaded=True, debug=True, port=3818)
