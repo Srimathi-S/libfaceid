@@ -1,5 +1,6 @@
 import sys
 import argparse
+from vonage_send_sms import send_message
 import cv2
 from libfaceid.detector import FaceDetectorModels, FaceDetector
 from libfaceid.encoder  import FaceEncoderModels, FaceEncoder
@@ -55,6 +56,7 @@ def process_facedetection():
     cam_index = 0
     cam_resolution = RESOLUTION_QVGA
     model_detector=FaceDetectorModels.HAARCASCADE
+    model_recognizer=FaceEncoderModels.LBPH
 #    model_detector=FaceDetectorModels.DLIBHOG
 #    model_detector=FaceDetectorModels.DLIBCNN
 #    model_detector=FaceDetectorModels.SSDRESNET
@@ -77,10 +79,12 @@ def process_facedetection():
         face_pose_estimator = FacePoseEstimator(model=model_poseestimator, path=INPUT_DIR_MODEL_ESTIMATION)
         face_age_estimator = FaceAgeEstimator(model=model_ageestimator, path=INPUT_DIR_MODEL_ESTIMATION)
         face_gender_estimator = FaceGenderEstimator(model=model_genderestimator, path=INPUT_DIR_MODEL_ESTIMATION)
+        # face_encoder = FaceEncoder(model=model_recognizer, path=INPUT_DIR_MODEL_ENCODING, path_training=INPUT_DIR_MODEL_TRAINING, training=False)
         # face_emotion_estimator = FaceEmotionEstimator(model=model_emotionestimator, path=INPUT_DIR_MODEL_ESTIMATION)
     except:
         print("Warning, check if models and trained dataset models exists!")
     (age, gender, emotion) = (None, None, None)
+    # (face_id, confidence) = ( None, 0)
 
 
     while (True):
@@ -94,6 +98,7 @@ def process_facedetection():
 
         # Detect and identify faces in the frame
         faces = face_detector.detect(frame)
+        allAge = []
         for (index, face) in enumerate(faces):
             (x, y, w, h) = face
 
@@ -102,11 +107,14 @@ def process_facedetection():
             age = face_age_estimator.estimate(frame, face_image)
             gender = face_gender_estimator.estimate(frame, face_image)
             # emotion = face_emotion_estimator.estimate(frame, face_image)
+            allAge.append(age)
 
             # Detect and draw face pose locations
             shape = face_pose_estimator.detect(frame, face)
             face_pose_estimator.add_overlay(frame, shape)
-
+            # face_id, confidence = face_encoder.identify(frame, (x, y, w, h))
+            
+            # label_face(frame, (x, y, w, h), face_id, confidence)
             # Display age, gender, emotion
             cv2.putText(frame, "Age: {}".format(age), 
                 (x, y-45), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, cv2.LINE_AA)
@@ -114,8 +122,15 @@ def process_facedetection():
                 (x, y-30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, cv2.LINE_AA)
             cv2.putText(frame, "Emotion: {}".format(emotion), 
                 (x, y-15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, cv2.LINE_AA)
+        
+        isAllChildren = all(ageItem in ['(0, 2)', '(4, 6)', '(8, 12)'] for ageItem in allAge)
 
-
+        print(isAllChildren)
+        if(isAllChildren):
+            print("sending sms..")
+            # send_message()
+        else:
+            print("No kids found...")
         # Display updated frame to web app
         yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + cv2.imencode('.jpg', frame)[1].tobytes() + b'\r\n\r\n')
 

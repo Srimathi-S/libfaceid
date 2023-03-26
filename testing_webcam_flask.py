@@ -122,4 +122,4 @@ def video_viewer():
 if __name__ == '__main__':
     print("\n\nNote: Open browser and type http://127.0.0.1:5000/ or http://ip_address:5000/ \n\n")
     # Run flask for web app
-    app.run(host='0.0.0.0', threaded=True, debug=True)
+    app.run(host='0.0.0.0', threaded=True, debug=True, port=3818)
