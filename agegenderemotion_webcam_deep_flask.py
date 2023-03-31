@@ -8,7 +8,6 @@ from libfaceid.pose import FacePoseEstimatorModels, FacePoseEstimator
 from libfaceid.age import FaceAgeEstimatorModels, FaceAgeEstimator
 from libfaceid.gender import FaceGenderEstimatorModels, FaceGenderEstimator
 from libfaceid.emotion import FaceEmotionEstimatorModels, FaceEmotionEstimator
-import pandas as pd
 
 
 # Use flask for web app
@@ -71,7 +70,7 @@ def process_facedetection():
 
 
     # Initialize the camera
-    camera = cam_init(cam_index, cam_resolution[0], cam_resolution[1])
+    # camera = cam_init(cam_index, cam_resolution[0], cam_resolution[1])
 
     try:
         # Initialize face detection
@@ -91,7 +90,7 @@ def process_facedetection():
     while (True):
 
         # Capture frame from webcam
-        ret, frame = camera.read()
+        frame = cv2.imread("/Users/srimathi/Downloads/kids.jpeg")
         if frame is None:
             print("Error, check if camera is connected!")
             break
@@ -114,14 +113,6 @@ def process_facedetection():
             shape = face_pose_estimator.detect(frame, face)
             face_pose_estimator.add_overlay(frame, shape)
             face_id, confidence = face_encoder.identify(frame, (x, y, w, h))
-
-            if(confidence > 80):
-                print("Match found", face_id)
-                df = pd.read_excel('user_data.xlsx')
-                person_row = df.loc[df['Name'] == face_id]
-                person_phone = person_row['Phone Number'].values[0]
-                print(person_phone)
-                # send_message(phone_number)
             
             label_face(frame, (x, y, w, h), face_id, confidence)
             # Display age, gender, emotion
@@ -144,7 +135,7 @@ def process_facedetection():
         yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + cv2.imencode('.jpg', frame)[1].tobytes() + b'\r\n\r\n')
 
     # Release the camera
-    camera.release()
+    # camera.release()
     cv2.destroyAllWindows()
 
 
