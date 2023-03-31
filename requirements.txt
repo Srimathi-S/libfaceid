@@ -11,3 +11,4 @@ facenet
 flask
 numpy
 dlib
+openpyxl
